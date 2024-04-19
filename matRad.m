@@ -26,7 +26,7 @@ load TG119.mat
 
 % meta information for treatment plan
 pln.numOfFractions  = 30;
-pln.radiationMode   = 'photons';           % either photons / protons / helium / carbon
+pln.radiationMode   = 'protons';           % either photons / protons / helium / carbon
 pln.machine         = 'Generic';
 
 % beam geometry settings
