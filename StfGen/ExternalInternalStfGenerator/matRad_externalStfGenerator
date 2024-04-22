@@ -1,0 +1,29 @@
+classdef matRad_externalStfGenerator < StfGenerator.matRad_StfGenerator
+% Implement these properties in a subclass
+    properties (Constant, Abstract)
+       shortName;              
+       name;             
+       possibleRadiationModes;
+    end    
+    
+    % Public properties
+    properties
+        gantryAngle;
+        couchAngle;
+        bixelWidth;
+        SAD;
+        isoCenter;
+        numOfRays;
+        ray;
+        sourcePoint_bev
+        sourcePoint;
+        numOfBixelPerRay;
+
+    end
+    
+    % Protected properties with public get access
+    properties (SetAccess = protected, GetAccess = public)
+        machine;                % base data defined in machine file
+    end
+
+end
