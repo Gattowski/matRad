@@ -2,8 +2,8 @@ classdef matRad_externalStfGenerator.m < StfGenerator.matRad_StfGenerator
 % Implement these properties in a subclass
     properties (Constant)
         possibleRadiationModes = {'protons','photons','carbon','helium'};
-        name = 'ExtStfGen';
-        shortName = 'ExtStfGen';
+        name = 'extStfGen';
+        shortName = 'extStfGen';
     end 
     
     % Public properties

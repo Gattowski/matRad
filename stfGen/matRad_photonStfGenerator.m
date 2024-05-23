@@ -2,8 +2,8 @@ classdef matRad_photonStfGen < ExternalInternalStfGenerator.matRad_externalStfGe
 
     properties (Constant)
         possibleRadiationModes = {'photons'};
-        name = 'PhotonExtStfGen';
-        shortName = 'PhotonExtStfGen';
+        name = 'photonExtStfGen';
+        shortName = 'photonExtStfGen';
     end     
 
     methods

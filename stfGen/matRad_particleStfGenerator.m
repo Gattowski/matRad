@@ -1,8 +1,8 @@
 classdef matRad_particleStfGen < ExternalInternalStfGenerator.matRad_externalStfGenerator
     properties (Constant)
         possibleRadiationModes = {'protons','carbon','helium'};
-        name = 'ParticleExtStfGen';
-        shortName = 'ParticleExtStfGen';
+        name = 'particleExtStfGen';
+        shortName = 'particleExtStfGen';
     end     
     
     % Public properties
