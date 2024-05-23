@@ -1,7 +1,7 @@
 classdef matRad_internalStfGenerator < StfGenerator.matRad_StfGenerator
 % Implement these properties in a subclass
     properties (Constant)
-        possibleRadiationModes = {'protons','photons','carbon','helium','neutrons'};
+        possibleRadiationModes = {'brachy'};
         name = 'IntStfGen';
         shortName = 'IntStfGen';
     end
