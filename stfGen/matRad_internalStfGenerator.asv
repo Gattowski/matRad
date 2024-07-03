@@ -2,8 +2,8 @@ classdef matRad_internalStfGenerator < matRad_StfGenerator
 
     properties (Constant)
         possibleRadiationModes = {'brachy'};
-        name = 'intStfGen';
-        shortName = 'intStfGen';
+        name = 'extStfGen';
+        shortName = 'extStfGen';
     end 
     
     methods
@@ -15,21 +15,12 @@ classdef matRad_internalStfGenerator < matRad_StfGenerator
                 this.matRad_cfg.dispError('no applicator information in pln struct');
             end
             
-            this = metaInfoFromPln(this);
-            this.generateImageCoordinates()
-            this.saveVoiCoordinates()
+
             this = this.generate2DTemplatePoints();
             this = this.generateSeedPositions();
-
-            this.visualizeBrachyResults();
+            this.matRad_cfg.dispInfo('Processing completed: %d%%\n', 100);
+            this.visualizeResults();
             this.checkSeedPoints();
-        end
-
-        function this = metaInfoFromPln(this)
-            this.stf.radiationMode = this.pln.radiationMode;
-            this.stf.numOfSeedsPerNeedle = this.pln.propStf.needle.seedsNo;
-            this.stf.numOfNeedles = nnz(this.pln.propStf.template.activeNeedles);
-            this.stf.totalNumOfBixels = this.stf.numOfSeedsPerNeedle * this.stf.numOfNeedles;
         end
         
      
@@ -60,7 +51,7 @@ classdef matRad_internalStfGenerator < matRad_StfGenerator
             this.stf.seedPoints.z = reshape(Z, 1, []);
         end
         
-        function visualizeBrachyResults(this)
+        function visualizeResults(this)
             if this.visMode > 0
                 clf
                 plot3(this.stf.seedPoints.x, this.stf.seedPoints.y, this.stf.seedPoints.z, '.', 'DisplayName', 'seed points', 'Color', 'black', 'markersize', 5);

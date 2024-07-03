@@ -1,5 +1,10 @@
 classdef matRad_externalStfGenerator < matRad_StfGenerator
 
+    properties (Constant)
+        possibleRadiationModes = {'protons','photons','carbon','helium'};
+        name = 'extStfGen';
+        shortName = 'extStfGen';
+    end 
     
     properties
         SAD
@@ -14,6 +19,15 @@ classdef matRad_externalStfGenerator < matRad_StfGenerator
             this.visualizeExtRadResults();
         end
            
+        function loadMachine(this)
+            fileName = [this.pln.radiationMode '_' this.pln.machine];
+            try
+                load([this.matRad_cfg.matRadRoot filesep 'basedata' filesep fileName]);
+                this.SAD = this.machine.meta.SAD;
+            catch
+                this.matRad_cfg.dispError('Could not find the following machine file: %s', fileName);
+            end
+        end
         
         function particleStructure(this)
             % To be implemented in particle subclass
@@ -21,45 +35,33 @@ classdef matRad_externalStfGenerator < matRad_StfGenerator
         
         function generateStf(this)
 
-            this.generateImageCoordinates()
-            this.saveVoiCoordinates()
+            this.validateInputs();
 
+            V = this.findTargetVoxels();
 
-            % loop over all rays to determine meta information for each ray
-            % 273 - 288
-            stf(i).numOfBixelsPerRay = ones(1,stf(i).numOfRays);
+            voiTarget = this.generateVoiCube(V);
+
+            voiTarget = this.addMarginIfRequired(voiTarget);
+
+            this.loadMachine
+
+            % loop over all rays to determine meta information for each ray    
+        stf(i).numOfBixelsPerRay = ones(1,stf(i).numOfRays);
     
+    for j = stf(i).numOfRays:-1:1
+
+        for ShiftScen = 1:pln.multScen.totNumShiftScen
+            % ray tracing necessary to determine depth of the target
+            [alphas,l{ShiftScen},rho{ShiftScen},d12,~] = matRad_siddonRayTracer(stf(i).isoCenter + pln.multScen.isoShift(ShiftScen,:), ...
+                ct.resolution, ...
+                stf(i).sourcePoint, ...
+                stf(i).ray(j).targetPoint, ...
+                [ct.cube {voiTarget}]);
             
+            %Used for generic range-shifter placement
+            ctEntryPoint = alphas(1) * d12;
+        end
 
-                for ShiftScen = 1:pln.multScen.totNumShiftScen
-                    % ray tracing necessary to determine depth of the target
-                    [alphas,l{ShiftScen},rho{ShiftScen},d12,~] = matRad_siddonRayTracer(stf(i).isoCenter + pln.multScen.isoShift(ShiftScen,:), ...
-                        ct.resolution, ...
-                        stf(i).sourcePoint, ...
-                        stf(i).ray(j).targetPoint, ...
-                        [ct.cube {voiTarget}]);
-            
-                    %Used for generic range-shifter placement
-                    ctEntryPoint = alphas(1) * d12;
-                end
-
-                if ~isfield(stf(i).ray,'energy')
-                        matRad_cfg.dispError('Error generating stf struct: no suitable energies found. Check if bixelwidth is too large.');
-                end
-                % store total number of rays for beam-i
-                stf(i).numOfRays = size(stf(i).ray,2);
-
-                % save total number of bixels
-                stf(i).totalNumOfBixels = sum(stf(i).numOfBixelsPerRay);
-    
-                % Show progress
-                if matRad_cfg.logLevel > 1
-                    matRad_progress(i,length(pln.propStf.gantryAngles));
-                end
-
-
-
-            
         end
 
         function visualizeExtRadResults(this)

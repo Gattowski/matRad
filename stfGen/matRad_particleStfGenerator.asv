@@ -1,10 +1,4 @@
 classdef matRad_particleStfGenerator < matRad_externalStfGenerator     
-
-        properties (Constant)
-        possibleRadiationModes = {'protons','carbon','helium'};
-        name = 'particleStfGen';
-        shortName = 'particleStfGen';
-    end 
     
     
     properties
@@ -145,10 +139,10 @@ classdef matRad_particleStfGenerator < matRad_externalStfGenerator
                                        
                          %If we need lower energies than available, consider
                          %range shifter (if asked for)
-                         if any(targetEntry < min(this.availablePeakPos)) && pln.propStf.useRangeShifter
+                         if any(targetEntry < min(availablePeakPos)) && pln.propStf.useRangeShifter
                              %Get Energies to use with range shifter to fill up
                              %non-reachable low-range spots
-                             raShiEnergies = this.availableEnergies(availablePeakPosRaShi >= targetEntry(k) & min(this.availablePeakPos) > availablePeakPosRaShi);
+                             raShiEnergies = availableEnergies(availablePeakPosRaShi >= targetEntry(k) & min(availablePeakPos) > availablePeakPosRaShi);
                         
                              raShi.ID = 1;
                              raShi.eqThickness = rangeShifterEqD;
@@ -159,7 +153,7 @@ classdef matRad_particleStfGenerator < matRad_externalStfGenerator
                          end
                     
                          %Normal placement without rangeshifter
-                         newEnergies = this.availableEnergies(this.availablePeakPos>=targetEntry(k)&this.availablePeakPos<=targetExit(k));
+                         newEnergies = availableEnergies(availablePeakPos>=targetEntry(k)&availablePeakPos<=targetExit(k));
                     
                     
                          stf(i).ray(j).energy = [stf(i).ray(j).energy newEnergies];
@@ -230,8 +224,8 @@ classdef matRad_particleStfGenerator < matRad_externalStfGenerator
                 maxEnergy = max([stf(i).ray.energy]);
         
                 % get corresponding peak position
-                minPeakPos  = machine.data(minEnergy == this.availableEnergies).peakPos;
-                maxPeakPos  = machine.data(maxEnergy == this.availableEnergies).peakPos;
+                minPeakPos  = machine.data(minEnergy == availableEnergies).peakPos;
+                maxPeakPos  = machine.data(maxEnergy == availableEnergies).peakPos;
         
                 % find set of energyies with adequate spacing
         
@@ -240,14 +234,14 @@ classdef matRad_particleStfGenerator < matRad_externalStfGenerator
         
                 tolerance              = longitudinalSpotSpacing/10;
         
-                useEnergyBool = this.availablePeakPos >= minPeakPos & this.availablePeakPos <= maxPeakPos;
+                useEnergyBool = availablePeakPos >= minPeakPos & availablePeakPos <= maxPeakPos;
         
                 ixCurr = find(useEnergyBool,1,'first');
                 ixRun  = ixCurr + 1;
                 ixEnd  = find(useEnergyBool,1,'last');
 
                 while ixRun <= ixEnd
-                    if abs(this.availablePeakPos(ixRun)-this.availablePeakPos(ixCurr)) < ...
+                    if abs(availablePeakPos(ixRun)-availablePeakPos(ixCurr)) < ...
                                             longitudinalSpotSpacing - tolerance
                         useEnergyBool(ixRun) = 0;
                     else
@@ -258,7 +252,7 @@ classdef matRad_particleStfGenerator < matRad_externalStfGenerator
         
                 for j = stf(i).numOfRays:-1:1
                     for k = stf(i).numOfBixelsPerRay(j):-1:1
-                        maskEnergy = stf(i).ray(j).energy(k) == this.availableEnergies;
+                        maskEnergy = stf(i).ray(j).energy(k) == availableEnergies;
                         if ~useEnergyBool(maskEnergy)
                             stf(i).ray(j).energy(k)         = [];
                             stf(i).ray(j).focusIx(k)        = [];
