@@ -4,6 +4,7 @@ classdef matRad_externalStfGenerator < matRad_StfGenerator
     properties
         SAD
         machine
+        
     end
     
     methods
@@ -11,7 +12,10 @@ classdef matRad_externalStfGenerator < matRad_StfGenerator
         function this = matRad_externalStfGenerator(ct, cst, pln, visMode)
             this@matRad_StfGenerator(ct, cst, pln, visMode);
 
+            
+
             this.visualizeExtRadResults();
+            
         end
            
         
@@ -64,20 +68,30 @@ classdef matRad_externalStfGenerator < matRad_StfGenerator
 
         function visualizeExtRadResults(this)
 
-            if visMode > 0
+            if this.visMode > 0
         
             clf;
             % first subplot: visualization in bev
             subplot(1,2,1)
             hold on
         
-            % plot rotated target coordinates
-            plot3(rot_coords(:,1),rot_coords(:,2),rot_coords(:,3),'r.')
+                % Compute rot_coords if necessary data is available
+                if exist('ct', 'var') && isfield(ct, 'cubeDim') && exist('rotMat_system_T', 'var')
+                    [X, Y, Z] = meshgrid((1:ct.cubeDim(2))-stf(i).isoCenter(1)/ct.resolution.x, ...
+                                         (1:ct.cubeDim(1))-stf(i).isoCenter(2)/ct.resolution.y, ...
+                                         (1:ct.cubeDim(3))-stf(i).isoCenter(3)/ct.resolution.z);
 
+                    coords = [X(:), Y(:), Z(:)];
+                    rot_coords = coords * rotMat_system_T;
+
+                    plot3(rot_coords(:,1), rot_coords(:,2), rot_coords(:,3), 'r.')
+                else
+                    error('Necessary data for computing rot_coords is missing');
+                end
             end
         
             % surface rendering
-            if visMode == 2
+            if this.visMode == 2
             
                 % generate a 3D rectangular grid centered at isocenter in
                 % voxel coordinates
@@ -177,7 +191,7 @@ classdef matRad_externalStfGenerator < matRad_StfGenerator
             end
         
             % surface rendering
-            if visMode == 2
+            if this.visMode == 2
                 surface = patch('Faces',f,'Vertices',v);
                 set(surface,'FaceColor',[0 0 1],'EdgeColor','none','FaceAlpha',.4);
                 lighting gouraud;

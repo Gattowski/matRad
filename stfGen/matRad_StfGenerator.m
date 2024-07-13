@@ -32,9 +32,6 @@ classdef matRad_StfGenerator
                 this.matRad_cfg.dispError('no applicator information in pln struct');
             end
             
-            this = this.generateImageCoordinates();
-            this = this.saveVoiCoordinates();
-            this = this.metaInfoFromPln();
             this.matRad_cfg.dispInfo('Processing completed: %d%%\n', 100);
 
             
@@ -68,9 +65,9 @@ classdef matRad_StfGenerator
             
             [coordsY_vox, coordsX_vox, coordsZ_vox] = ind2sub(this.ct.cubeDim, V);
             
-            this.stf.targetVolume.Xvox = this.ct.x(coordsX_vox);
-            this.stf.targetVolume.Yvox = this.ct.y(coordsY_vox);
-            this.stf.targetVolume.Zvox = this.ct.z(coordsZ_vox);
+            this.stf.targetVolume.Xvox = coordsX_vox;
+            this.stf.targetVolume.Yvox = coordsY_vox;
+            this.stf.targetVolume.Zvox = coordsZ_vox;
             
             V = [this.cst{:, 4}];
             V = unique(vertcat(V{:}));
@@ -83,14 +80,24 @@ classdef matRad_StfGenerator
         end
         
         function this = saveVoiCoordinates(this)
-            this.stf.targetVolume.Xvox = this.ct.x(this.stf.targetVolume.Xvox);
-            this.stf.targetVolume.Yvox = this.ct.y(this.stf.targetVolume.Yvox);
-            this.stf.targetVolume.Zvox = this.ct.z(this.stf.targetVolume.Zvox);
+            % Ensure the voxel coordinates are within valid range
+            if all(this.stf.targetVolume.Xvox > 0 & this.stf.targetVolume.Xvox <= length(this.ct.x)) && ...
+               all(this.stf.targetVolume.Yvox > 0 & this.stf.targetVolume.Yvox <= length(this.ct.y)) && ...
+               all(this.stf.targetVolume.Zvox > 0 & this.stf.targetVolume.Zvox <= length(this.ct.z))
+                
+                % Ensure voxel coordinates are integers
+                this.stf.targetVolume.Xvox = round(this.stf.targetVolume.Xvox);
+                this.stf.targetVolume.Yvox = round(this.stf.targetVolume.Yvox);
+                this.stf.targetVolume.Zvox = round(this.stf.targetVolume.Zvox);
+                
+                this.stf.targetVolume.Xvox = this.ct.x(this.stf.targetVolume.Xvox);
+                this.stf.targetVolume.Yvox = this.ct.y(this.stf.targetVolume.Yvox);
+                this.stf.targetVolume.Zvox = this.ct.z(this.stf.targetVolume.Zvox);
+            else
+                error('Indices must be positive integers and within valid range');
+            end
         end
-        
-        
 
-        
     end
 end
 

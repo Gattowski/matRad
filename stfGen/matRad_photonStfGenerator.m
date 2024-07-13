@@ -37,5 +37,7 @@ classdef matRad_photonStfGenerator < matRad_externalStfGenerator
 
             
         end
+
+        
     end
 end
