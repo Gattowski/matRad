@@ -150,8 +150,8 @@ display(pln);
 %% Generate Beam Geometry STF
 % The steering file struct comprises the complete beam geometry along with 
 % ray position, pencil beam positions and energies, source to axis distance (SAD) etc.
-stfGen = matRad_photonStfGenerator(ct, cst, pln, 2); % Use the photon STf generator
-stf = stfGen.generateStf();
+photonStfGen = matRad_photonStfGenerator(pln);
+stf = photonStfGen.generate(ct,cst);
 
 %%
 % Let's display the beam geometry information of the 6th beam

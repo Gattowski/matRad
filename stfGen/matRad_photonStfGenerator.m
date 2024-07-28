@@ -6,38 +6,63 @@ classdef matRad_photonStfGenerator < matRad_externalStfGenerator
         shortName = 'photonStfGen';
     end 
 
-
-    methods
-        function this = matRad_photonStfGenerator(ct, cst, pln, visMode)
-            this@matRad_externalStfGenerator(ct, cst, pln, visMode);
-        end
-        
-        function generateStf(this) % photon stf 
-            generateStf@matRad_externalStfGenerator(this);
-            
-            % Save ray and target position in lps system. 260-275
-            for j = 1:stf(i).numOfRays
-                         stf(i).ray(j).beamletCornersAtIso = [rayPos(j,:) + [+stf(i).bixelWidth/2,0,+stf(i).bixelWidth/2];...
-                                                              rayPos(j,:) + [-stf(i).bixelWidth/2,0,+stf(i).bixelWidth/2];...
-                                                              rayPos(j,:) + [-stf(i).bixelWidth/2,0,-stf(i).bixelWidth/2];...
-                                                              rayPos(j,:) + [+stf(i).bixelWidth/2,0,-stf(i).bixelWidth/2]]*rotMat_vectors_T;
-                         stf(i).ray(j).rayCorners_SCD = (repmat([0, machine.meta.SCD - SAD, 0],4,1)+ (machine.meta.SCD/SAD) * ...
-                                                                          [rayPos(j,:) + [+stf(i).bixelWidth/2,0,+stf(i).bixelWidth/2];...
-                                                                           rayPos(j,:) + [-stf(i).bixelWidth/2,0,+stf(i).bixelWidth/2];...
-                                                                           rayPos(j,:) + [-stf(i).bixelWidth/2,0,-stf(i).bixelWidth/2];...
-                                                                           rayPos(j,:) + [+stf(i).bixelWidth/2,0,-stf(i).bixelWidth/2]])*rotMat_vectors_T;
-            end
-
-
-
-            for j = stf(i).numOfRays:-1:1 % -463
-                 % book keeping for photons
-                 stf(i).ray(j).energy = machine.data.energy;
-            end
-
-            
-        end
-
+    properties (Access = protected)
         
     end
+    
+    methods 
+        function this = matRad_photonStfGenerator(pln)
+            if nargin < 1
+                pln = [];
+            end
+            this@matRad_externalStfGenerator(pln);
+
+            matRad_cfg = MatRad_Config.instance();
+            addpath(fullfile(matRad_cfg.matRadRoot));
+
+
+            
+            if ~isfield(pln, 'propStf')
+                matRad_cfg.dispError('no applicator information in pln struct');
+            end
+         end
+    end
+
+    methods 
+
+        function stf = generate(this, ct, cst)
+            stf = generate@matRad_externalStfGenerator(this, ct, cst);
+            this.initializePatientGeometry(ct, cst);
+            stf = this.generateSourceGeometry(ct, cst);
+        end
+    end
+
+    methods (Access = protected)
+        function initializePatientGeometry(this, ct, cst)
+            % Initialize the patient geometry
+            initializePatientGeometry@matRad_externalStfGenerator(this);
+
+        end
+        
+        function pbMargin = getPbMargin(this)
+            pbMargin = getPbMargin@matRad_externalStfGenerator(this);
+            pbMargin = pln.propStf.bixelWidth;
+        end
+        
+        function stf = generateSourceGeometry(this, ct, cst)
+            stf = generateSourceGeometry@matRad_externalStfGenerator(this);
+
+            % book keeping for photons
+            stf(i).ray(j).energy = machine.data.energy;
+        end
+
+        function initializeEnergy(this,ct,cst)
+            initializeEnergy@matRad_externalStfGenerator(this, ct, cst);
+
+            % book keeping for photons
+            stf(i).ray(j).energy = machine.data.energy;
+        end
+
+    end
 end
+
